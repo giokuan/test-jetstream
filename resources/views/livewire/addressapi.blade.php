@@ -1,29 +1,35 @@
+<!-- resources/views/livewire/address-dropdown.blade.php -->
+
 <div>
-    <h2>Select a Region:</h2>
-    <select id="region_select" wire:model="selectedRegion" wire:change="regionSelected">
+    <select wire:model="selectedRegion" wire:change="setSelectedRegion($event.target.value)">
         <option value="">Select Region</option>
-        @foreach ($regions as $regionId => $region)
-            <option value="{{ $regionId }}">{{ $region['region_name'] ?? 'Region name not available' }}</option>
+        @foreach ($regions as $regionKey => $region)
+            <option value="{{ $regionKey }}">{{ $region['region_name'] }}</option>
         @endforeach
     </select>
 
-    @if (!empty($provinces))
-        <h2>Select a Province:</h2>
-        <select id="province_select" wire:model="selectedProvince">
-            <option value="">Select Province</option>
-            @foreach ($provinces as $provinceId => $province)
-                <option value="{{ $provinceId }}">{{ $province }}</option>
-            @endforeach
-        </select>
-    @endif
+    <select wire:model="selectedProvince" wire:change="setSelectedProvince($event.target.value)">
+        <option value="">Select Province</option>
+        @foreach ($provinces as $province => $data)
+            <option value="{{ $province }}">{{ $province }}</option>
+        @endforeach
+    </select>
 
-    @if (!empty($municipalities))
-        <h2>Select a municipality:</h2>
-        <select id="municipality_select" wire:model="selectedMunicipality">
-            <option value="">Select Municipality</option>
-            @foreach ($municipalities as $municipalityId => $municipality)
-                <option value="{{ $municipalityId }}">{{ $municipality }}</option>
+    <select wire:model="selectedMunicipality" wire:change="setSelectedMunicipality($event.target.value)">
+        <option value="">Select Municipality</option>
+        @if ($selectedRegion && $selectedProvince)
+            @foreach ($regions[$selectedRegion]['province_list'][$selectedProvince]['municipality_list'] as $municipality => $data)
+                <option value="{{ $municipality }}">{{ $municipality }}</option>
             @endforeach
-        </select>
-    @endif
+        @endif
+    </select>
+
+    <select wire:model="selectedBarangay">
+        <option value="">Select Barangay</option>
+        @if ($selectedRegion && $selectedProvince && $selectedMunicipality)
+            @foreach ($regions[$selectedRegion]['province_list'][$selectedProvince]['municipality_list'][$selectedMunicipality]['barangay_list'] as $barangay)
+                <option value="{{ $barangay }}">{{ $barangay }}</option>
+            @endforeach
+        @endif
+    </select>
 </div>
